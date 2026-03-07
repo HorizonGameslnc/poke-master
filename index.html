@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pokemon Emerald Mobile Edition</title>
+    
+    <style>
+        body { 
+            margin: 0; 
+            background: #222; 
+            color: white;
+            font-family: sans-serif;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        #game-screen {
+            width: 320px;
+            height: 320px;
+            background: #4e9c4e; /* Cor de grama */
+            position: relative;
+            border: 4px solid #333;
+            margin-top: 20px;
+            overflow: hidden;
+        }
+
+        #player {
+            width: 32px;
+            height: 32px;
+            background: red; /* Representa o Brendan/May */
+            position: absolute;
+            top: 144px;
+            left: 144px;
+            border-radius: 4px;
+            transition: 0.1s;
+        }
+
+        /* Estilo da Batalha */
+        #battle-scene {
+            position: absolute;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: white;
+            color: black;
+            display: none;
+            flex-direction: column;
+            padding: 10px;
+            box-sizing: border-box;
+        }
+
+        .hp-bar {
+            width: 100%;
+            height: 10px;
+            background: #eee;
+            border: 1px solid #000;
+        }
+
+        .hp-fill {
+            height: 100%;
+            background: green;
+            width: 100%;
+            transition: 0.5s;
+        }
+
+        /* Controles para Celular */
+        .controls {
+            margin-top: 20px;
+            display: grid;
+            grid-template-columns: repeat(3, 60px);
+            gap: 10px;
+        }
+
+        button {
+            padding: 15px;
+            font-weight: bold;
+            background: #555;
+            color: white;
+            border: none;
+            border-radius: 8px;
+        }
+    </style>
+</head>
+<body>
+
+    <h2>Pokemon Emerald Web</h2>
+
+    <div id="game-screen">
+        <div id="player"></div>
+
+        <div id="battle-scene">
+            <p><strong>Rayquaza Selvagem</strong></p>
+            <div class="hp-bar"><div id="enemy-hp" class="hp-fill"></div></div>
+            
+            <p style="margin-top: 50px;"><strong>Seu Sceptile</strong></p>
+            <div class="hp-bar"><div id="player-hp" class="hp-fill"></div></div>
+
+            <p id="msg">O que fazer?</p>
+            
+            <div style="display: flex; gap: 5px;">
+                <button onclick="ataque()" style="background: darkred;">Lutar</button>
+                <button onclick="capturar()" style="background: darkblue;">Pokébola</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="controls">
+        <div></div><button onclick="mover(0, -16)">↑</button><div></div>
+        <button onclick="mover(-16, 0)">←</button><button onclick="mover(0, 16)">↓</button><button onclick="mover(16, 0)">→</button>
+    </div>
+
+    <script>
+        let px = 144;
+        let py = 144;
+        let inBattle = false;
+        let enemyHP = 100;
+
+        const player = document.getElementById('player');
+        const battleScene = document.getElementById('battle-scene');
+
+        function mover(dx, dy) {
+            if (inBattle) return;
+
+            px += dx;
+            py += dy;
+
+            // Limites básicos
+            px = Math.max(0, Math.min(288, px));
+            py = Math.max(0, Math.min(288, py));
+
+            player.style.left = px + 'px';
+            player.style.top = py + 'px';
+
+            // 10% de chance de achar um Pokémon ao andar
+            if (Math.random() < 0.1) iniciarBatalha();
+        }
+
+        function iniciarBatalha() {
+            inBattle = true;
+            enemyHP = 100;
+            document.getElementById('enemy-hp').style.width = '100%';
+            battleScene.style.display = 'flex';
+            document.getElementById('msg').innerText = "Um Rayquaza apareceu!";
+        }
+
+        function ataque() {
+            enemyHP -= 25;
+            document.getElementById('enemy-hp').style.width = enemyHP + '%';
+            document.getElementById('msg').innerText = "Você usou Corte de Folha!";
+            
+            if (enemyHP <= 0) {
+                document.getElementById('msg').innerText = "Venceu!";
+                setTimeout(fimBatalha, 1500);
+            }
+        }
+
+        function capturar() {
+            document.getElementById('msg').innerText = "Tentando capturar...";
+            setTimeout(() => {
+                if (Math.random() > 0.5) {
+                    document.getElementById('msg').innerText = "Capturado com sucesso!";
+                    setTimeout(fimBatalha, 1500);
+                } else {
+                    document.getElementById('msg').innerText = "Ele escapou!";
+                }
+            }, 1000);
+        }
+
+        function fimBatalha() {
+            inBattle = false;
+            battleScene.style.display = 'none';
+        }
+    </script>
+</body>
+</html>
